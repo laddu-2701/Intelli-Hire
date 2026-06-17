@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Resume Parser & Candidate Ranking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body class="theme-dark">
+    <div class="page-shell">
+        <header class="top-nav">
+            <div class="brand">
+                <div class="brand-mark">AI</div>
+                <div class="brand-text">
+                    <span class="brand-name">IntelliHire</span>
+                    <span class="brand-subtitle">AI Resume Parser & Ranking</span>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="#about">About</a>
+                <a href="#how-it-works">How it works</a>
+                <a href="#features">Features</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="#tech">Tech Stack</a>
+            </nav>
+            <div class="nav-actions">
+                <button class="mode-toggle" id="modeToggle" aria-label="Toggle dark and light mode">
+                    <span class="mode-icon mode-icon-moon">&#9790;</span>
+                    <span class="mode-icon mode-icon-sun">&#9728;</span>
+                </button>
+                <button class="ghost-btn" data-auth-trigger="login">Log in</button>
+                <button class="nav-cta" data-auth-trigger="signup">Sign up</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Auth Modal -->
+            <div class="auth-modal-overlay" id="authModal" aria-hidden="true">
+                <div class="auth-modal glass-card">
+                    <button class="auth-close" id="authClose" aria-label="Close">&times;</button>
+                    <div class="auth-toggle">
+                        <button class="auth-tab auth-tab-active" data-auth-mode="login">Log in</button>
+                        <button class="auth-tab" data-auth-mode="signup">Sign up</button>
+                    </div>
+                    <form class="auth-form" id="authForm">
+                        <div class="auth-field" id="authNameField" style="display: none;">
+                            <label for="authFullName">Full name</label>
+                            <input type="text" id="authFullName" autocomplete="name" />
+                        </div>
+                        <div class="auth-field">
+                            <label for="authEmail">Email</label>
+                            <input type="email" id="authEmail" autocomplete="email" required />
+                        </div>
+                        <div class="auth-field">
+                            <label for="authPassword">Password</label>
+                            <input type="password" id="authPassword" autocomplete="current-password" required />
+                        </div>
+                        <p class="auth-error" id="authError" role="alert"></p>
+                        <button type="submit" class="primary-btn auth-submit" id="authSubmit">Continue</button>
+                        <p class="auth-hint">Demo only &mdash; credentials are stored for this session only.</p>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Hero Section -->
+            <section id="hero" class="section hero">
+                <div class="hero-layout">
+                    <div class="hero-copy glass-card">
+                        <h1>Automate Hiring with AI</h1>
+                        <p>Smart resume parsing and candidate ranking using NLP, Machine Learning, and advanced text mining. Turn unstructured resumes into structured, searchable talent profiles in seconds.</p>
+                        <div class="hero-cta-group">
+                            <button class="primary-btn" data-scroll-target="#hero-upload">Upload Resume</button>
+                            <a class="ghost-btn" href="dashboard.html">View Candidate Dashboard</a>
+                        </div>
+                        
+                    </div>
+
+                    <div class="hero-console glass-card" id="hero-upload">
+                        <h2>AI-Powered Resume Intake</h2>
+                        <p class="hero-console-sub">Drag &amp; drop PDF, DOC, or DOCX files. Our engine handles OCR, NLP extraction, and ML-based ranking.</p>
+
+                        <div class="upload-area" id="uploadArea">
+                            <input type="file" id="fileInput" class="file-input" multiple accept=".pdf,.doc,.docx" />
+                            <div class="upload-icon">&#8682;</div>
+                            <p class="upload-title">Drag &amp; drop resumes here</p>
+                            <p class="upload-sub">or <span class="upload-browse">browse files</span></p>
+                            <p class="upload-hint">Supported: PDF, DOC, DOCX &bull; Max 10 files</p>
+                        </div>
+
+                        <div class="progress-panel">
+                            <div class="progress-header">
+                                <span>Parsing pipeline</span>
+                                <span class="status-pill" id="pipelineStatus">Idle</span>
+                            </div>
+                            <div class="pipeline-steps">
+                                <div class="pipeline-step" data-step="1">
+                                    <span class="step-dot"></span>
+                                    <div class="step-text">
+                                        <span class="step-title">OCR &amp; text normalisation</span>
+                                        <span class="step-subtitle">Handle scanned and low-quality resumes</span>
+                                    </div>
+                                </div>
+                                <div class="pipeline-step" data-step="2">
+                                    <span class="step-dot"></span>
+                                    <div class="step-text">
+                                        <span class="step-title">NLP entity extraction</span>
+                                        <span class="step-subtitle">Name, contact, skills, education, experience</span>
+                                    </div>
+                                </div>
+                                <div class="pipeline-step" data-step="3">
+                                    <span class="step-dot"></span>
+                                    <div class="step-text">
+                                        <span class="step-title">Semantic matching</span>
+                                        <span class="step-subtitle">Align to job description &amp; role taxonomy</span>
+                                    </div>
+                                </div>
+                                <div class="pipeline-step" data-step="4">
+                                    <span class="step-dot"></span>
+                                    <div class="step-text">
+                                        <span class="step-title">ML ranking engine</span>
+                                        <span class="step-subtitle">Score, rank, and shortlist candidates</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="file-progress-list" id="fileProgressList">
+                                <p class="empty-state">No resumes uploaded yet.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About -->
+            <section id="about" class="section">
+                <div class="section-header">
+                    <h2>Why AI Resume Parsing?</h2>
+                    <p>Traditional resume screening is slow, manual, and prone to bias. IntelliHire transforms hiring into a data-driven, scalable workflow.</p>
+                </div>
+                <div class="two-column-grid">
+                    <div class="glass-card">
+                        <h3>The problem</h3>
+                        <ul class="bullet-list">
+                            <li>Recruiters manually read hundreds of unstructured resumes per role.</li>
+                            <li>Inconsistent criteria introduce unconscious bias and missed talent.</li>
+                            <li>Scanned or poorly formatted resumes often fall through the cracks.</li>
+                            <li>Teams lack a unified, searchable candidate knowledge base.</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card accent-border">
+                        <h3>The solution</h3>
+                        <ul class="bullet-list">
+                            <li>AI-driven parsing standardises how information is extracted and stored.</li>
+                            <li>NLP models understand skills, context, and domain-specific language.</li>
+                            <li>Machine learning ranks candidates against job descriptions objectively.</li>
+                            <li>ATS-style dashboards make your entire talent pool searchable and sortable.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How It Works -->
+            <section id="how-it-works" class="section">
+                <div class="section-header">
+                    <h2>How It Works</h2>
+                    <p>An end-to-end pipeline from raw resume to ranked shortlist.</p>
+                </div>
+                <div class="steps-grid">
+                    <div class="step-card glass-card">
+                        <div class="step-index">01</div>
+                        <h3>Upload Resume</h3>
+                        <p>Drag &amp; drop PDFs, Word documents, or bulk upload from your ATS.</p>
+                    </div>
+                    <div class="step-card glass-card">
+                        <div class="step-index">02</div>
+                        <h3>Extract Text (OCR)</h3>
+                        <p>OCR engine recovers text from scanned or image-based resumes.</p>
+                    </div>
+                    <div class="step-card glass-card">
+                        <div class="step-index">03</div>
+                        <h3>NLP Processing</h3>
+                        <p>Advanced NLP models identify entities like skills, education, and experience.</p>
+                    </div>
+                    <div class="step-card glass-card">
+                        <div class="step-index">04</div>
+                        <h3>Skill &amp; JD Matching</h3>
+                        <p>Semantic similarity maps resumes to specific roles and job descriptions.</p>
+                    </div>
+                    <div class="step-card glass-card">
+                        <div class="step-index">05</div>
+                        <h3>Ranking &amp; Shortlisting</h3>
+                        <p>ML ranking engine assigns scores, ranks candidates, and surfaces a shortlist.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features -->
+            <section id="features" class="section">
+                <div class="section-header">
+                    <h2>Platform Features</h2>
+                    <p>Built to feel like a modern ATS, powered by AI from the ground up.</p>
+                </div>
+                <div class="features-grid">
+                    <article class="feature-card glass-card">
+                        <h3>Smart Parsing</h3>
+                        <p>Normalises unstructured resumes into clean, structured candidate profiles with fields for contact details, skills, education, and history.</p>
+                    </article>
+                    <article class="feature-card glass-card">
+                        <h3>Semantic Understanding</h3>
+                        <p>Understands synonyms, related skills, and domain-specific terminology using transformer-based NLP models.</p>
+                    </article>
+                    <article class="feature-card glass-card">
+                        <h3>ML Ranking Engine</h3>
+                        <p>Combines keyword relevance, experience depth, recency, and seniority into a single relevance score.</p>
+                    </article>
+                    <article class="feature-card glass-card">
+                        <h3>ATS Integration</h3>
+                        <p>Designed to plug into existing HR ecosystems via REST APIs and webhook-based workflows.</p>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Dashboard Preview -->
+            <section id="dashboard" class="section dashboard-section">
+                <div class="section-header">
+                    <h2>Interactive Candidate Dashboard</h2>
+                    <p>Search, filter, and rank candidates in real time &mdash; just like a premium ATS.</p>
+                </div>
+
+                <div class="dashboard-layout glass-card">
+                    <aside class="dashboard-filters">
+                        <h3>Filters</h3>
+                        <label class="field">
+                            <span>Search candidates</span>
+                            <input type="text" id="searchInput" placeholder="Search by name or skill" />
+                        </label>
+                        <label class="field">
+                            <span>Minimum relevance score</span>
+                            <div class="range-row">
+                                <input type="range" id="minScore" min="0" max="100" value="50" />
+                                <span class="range-value" id="minScoreValue">50</span>
+                            </div>
+                        </label>
+                        <label class="field">
+                            <span>Sort by</span>
+                            <select id="sortBy">
+                                <option value="score">Score (high to low)</option>
+                                <option value="experience">Experience (years)</option>
+                                <option value="name">Name (A&ndash;Z)</option>
+                            </select>
+                        </label>
+                    </aside>
+
+                    <div class="dashboard-main">
+                        <div class="dashboard-header-row">
+                            <div>
+                                <h3>Candidates</h3>
+                                <p class="sub">Parsed from resumes &amp; ranked against the active job description.</p>
+                            </div>
+                            <div class="dashboard-stats">
+                                <div class="stat-chip">
+                                    <span id="totalCandidates">0</span>
+                                    <span class="stat-label">Total candidates</span>
+                                </div>
+                                <div class="stat-chip">
+                                    <span id="visibleCandidates">0</span>
+                                    <span class="stat-label">Matching filters</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="score-summary">
+                            <div class="score-pill">
+                                <span>High match (&ge; 80)</span>
+                                <div class="score-bar"><div class="score-bar-fill" id="highMatchBar"></div></div>
+                            </div>
+                            <div class="score-pill">
+                                <span>Medium match (60&ndash;79)</span>
+                                <div class="score-bar"><div class="score-bar-fill" id="mediumMatchBar"></div></div>
+                            </div>
+                            <div class="score-pill">
+                                <span>Low match (&lt; 60)</span>
+                                <div class="score-bar"><div class="score-bar-fill" id="lowMatchBar"></div></div>
+                            </div>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table class="candidate-table">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Name</th>
+                                        <th>Key Skills</th>
+                                        <th>Experience</th>
+                                        <th>Relevance Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="candidateTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tech Stack -->
+            <section id="tech" class="section">
+                <div class="section-header">
+                    <h2>Technology Stack</h2>
+                    <p>Modern AI and backend technologies orchestrated into an end-to-end hiring assistant.</p>
+                </div>
+                <div class="tech-grid">
+                    <div class="glass-card">
+                        <h3>AI &amp; ML</h3>
+                        <p>Machine learning models for scoring and ranking, leveraging feature engineering on skills, experience, and semantic similarity.</p>
+                        <ul class="tag-list">
+                            <li>Supervised ML models</li>
+                            <li>Ranking algorithms</li>
+                            <li>Model monitoring</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card">
+                        <h3>NLP &amp; Information Retrieval</h3>
+                        <p>Text mining, entity recognition, and semantic search to understand and match resumes with job descriptions.</p>
+                        <ul class="tag-list">
+                            <li>Named Entity Recognition</li>
+                            <li>Embeddings &amp; similarity</li>
+                            <li>Keyword expansion</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card">
+                        <h3>Backend &amp; APIs</h3>
+                        <p>Scalable services for parsing, ranking, and ATS integration.</p>
+                        <ul class="tag-list">
+                            <li>Python (NLP &amp; ML services)</li>
+                            <li>Spring Boot (REST APIs)</li>
+                            <li>MySQL (structured candidate storage)</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card">
+                        <h3>Storage &amp; ATS Layer</h3>
+                        <p>Persistent, queryable talent database for an ATS-like experience.</p>
+                        <ul class="tag-list">
+                            <li>Normalized candidate schema</li>
+                            <li>Full-text search</li>
+                            <li>Role-based access</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Advantages & Limitations -->
+            <section id="advantages" class="section">
+                <div class="section-header">
+                    <h2>Advantages &amp; Limitations</h2>
+                    <p>AI accelerates hiring, but transparency about trade-offs still matters.</p>
+                </div>
+                <div class="two-column-grid">
+                    <div class="glass-card">
+                        <h3>Advantages</h3>
+                        <ul class="bullet-list">
+                            <li>Reduces manual screening effort for large candidate volumes.</li>
+                            <li>Standardises decision criteria to minimise human bias.</li>
+                            <li>Handles unstructured, noisy, or scanned resumes via OCR and NLP.</li>
+                            <li>Improves time-to-hire and recruiter productivity.</li>
+                            <li>Creates a structured, searchable candidate database.</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card subtle">
+                        <h3>Limitations</h3>
+                        <ul class="bullet-list">
+                            <li>OCR quality degrades with very low-resolution or poorly scanned documents.</li>
+                            <li>Soft skills, culture fit, and potential still require human judgment.</li>
+                            <li>Domain adaptation is needed for highly specialised roles.</li>
+                            <li>Models require continuous retraining as job markets evolve.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-inner">
+                <span>&copy; <span id="year"></span> IntelliHire &mdash; AI Resume Parser &amp; Candidate Ranking System.</span>
+                <span class="footer-note">Conceptual academic/portfolio project &mdash; not a live ATS product.</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

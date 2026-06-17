@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IntelliHire Dashboard &mdash; AI Candidate Ranking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body class="theme-dark">
+    <div class="page-shell">
+        <header class="top-nav">
+            <div class="brand">
+                <div class="brand-mark">AI</div>
+                <div class="brand-text">
+                    <span class="brand-name">IntelliHire</span>
+                    <span class="brand-subtitle">AI Resume Parser & Ranking</span>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html#hero">Home</a>
+                <a href="index.html#about">About</a>
+                <a href="index.html#features">Features</a>
+                <a href="dashboard.html">Dashboard</a>
+            </nav>
+            <div class="nav-actions">
+                <button class="mode-toggle" id="modeToggle" aria-label="Toggle dark and light mode">
+                    <span class="mode-icon mode-icon-moon">&#9790;</span>
+                    <span class="mode-icon mode-icon-sun">&#9728;</span>
+                </button>
+                <button class="ghost-btn" data-auth-trigger="login">Log in</button>
+                <button class="nav-cta" data-auth-trigger="signup">Sign up</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Auth Modal (shared markup with index) -->
+            <div class="auth-modal-overlay" id="authModal" aria-hidden="true">
+                <div class="auth-modal glass-card">
+                    <button class="auth-close" id="authClose" aria-label="Close">&times;</button>
+                    <div class="auth-toggle">
+                        <button class="auth-tab auth-tab-active" data-auth-mode="login">Log in</button>
+                        <button class="auth-tab" data-auth-mode="signup">Sign up</button>
+                    </div>
+                    <form class="auth-form" id="authForm">
+                        <div class="auth-field" id="authNameField" style="display: none;">
+                            <label for="authFullName">Full name</label>
+                            <input type="text" id="authFullName" autocomplete="name" />
+                        </div>
+                        <div class="auth-field">
+                            <label for="authEmail">Email</label>
+                            <input type="email" id="authEmail" autocomplete="email" required />
+                        </div>
+                        <div class="auth-field">
+                            <label for="authPassword">Password</label>
+                            <input type="password" id="authPassword" autocomplete="current-password" required />
+                        </div>
+                        <p class="auth-error" id="authError" role="alert"></p>
+                        <button type="submit" class="primary-btn auth-submit" id="authSubmit">Continue</button>
+                        <p class="auth-hint">Demo only &mdash; credentials are stored for this session only.</p>
+                    </form>
+                </div>
+            </div>
+
+            <section class="section dashboard-section">
+                <div class="section-header">
+                    <h2>Candidate Ranking Dashboard</h2>
+                    <p>Live view of parsed candidates, ranked by AI across skills, education, projects, experience, and semantic match.</p>
+                </div>
+
+                <div class="dashboard-layout glass-card">
+                    <aside class="dashboard-filters">
+                        <h3>Filters</h3>
+                        <label class="field">
+                            <span>Search candidates</span>
+                            <input type="text" id="searchInput" placeholder="Search by name or skill" />
+                        </label>
+                        <label class="field">
+                            <span>Minimum overall score</span>
+                            <div class="range-row">
+                                <input type="range" id="minScore" min="0" max="100" value="50" />
+                                <span class="range-value" id="minScoreValue">50</span>
+                            </div>
+                        </label>
+                        <label class="field">
+                            <span>Sort by</span>
+                            <select id="sortBy">
+                                <option value="score">Overall score (high to low)</option>
+                                <option value="experience">Experience (years)</option>
+                                <option value="name">Name (A&ndash;Z)</option>
+                            </select>
+                        </label>
+                    </aside>
+
+                    <div class="dashboard-main">
+                        <div class="dashboard-header-row">
+                            <div>
+                                <h3>Candidates</h3>
+                                <p class="sub">Pulled from the IntelliHire API at <code>/api/candidates</code>.</p>
+                            </div>
+                            <div class="dashboard-stats">
+                                <div class="stat-chip">
+                                    <span id="totalCandidates">0</span>
+                                    <span class="stat-label">Total candidates</span>
+                                </div>
+                                <div class="stat-chip">
+                                    <span id="visibleCandidates">0</span>
+                                    <span class="stat-label">Matching filters</span>
+                                </div>
+                                <button type="button" class="ghost-btn" id="clearCandidatesBtn" title="Remove all parsed candidates from this demo database">Clear all</button>
+                            </div>
+                        </div>
+
+                        <div class="score-summary">
+                            <div class="score-pill">
+                                <span>High match (&ge; 80)</span>
+                                <div class="score-bar"><div class="score-bar-fill" id="highMatchBar"></div></div>
+                            </div>
+                            <div class="score-pill">
+                                <span>Medium match (60&ndash;79)</span>
+                                <div class="score-bar"><div class="score-bar-fill" id="mediumMatchBar"></div></div>
+                            </div>
+                            <div class="score-pill">
+                                <span>Low match (&lt; 60)</span>
+                                <div class="score-bar"><div class="score-bar-fill" id="lowMatchBar"></div></div>
+                            </div>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table class="candidate-table">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Name</th>
+                                        <th>Key Skills</th>
+                                        <th>Experience</th>
+                                        <th>Overall</th>
+                                        <th>Breakdown</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="candidateTableBody"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="candidate-explanation-panel">
+                            <h4>Score explanation &amp; tips</h4>
+                            <div class="candidate-factors" id="candidateFactorList">
+                                <p class="candidate-explanation-text">Select a candidate row to see how the parser broke down their score across factors.</p>
+                            </div>
+                            <div class="candidate-improvements" id="candidateImprovements">
+                                <!-- Filled dynamically with improvement points -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-inner">
+                <span>&copy; <span id="year"></span> IntelliHire &mdash; AI Resume Parser &amp; Candidate Ranking System.</span>
+                <span class="footer-note">Conceptual academic/portfolio project &mdash; not a live ATS product.</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
